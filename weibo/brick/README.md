@@ -26,5 +26,32 @@ SSD benchmark, showing about 230 MB/s reading speed (blue), 210 MB/s writing spe
 from http://en.wikipedia.org/wiki/Solid-state_drive
 ```
 
+### Zero Copy File Transfer
 
+通过GO的io.Copy方法进行大文件快速传输，可以做到内存零拷贝
+io.Copy方法优先通过src的WriteTo方法进行拷贝，若不存在则通过dst的ReaderFrom方法进行拷贝，若都不存在则通过内存进行拷贝
+GO语言中的bufio实现了WriteTo方法，底层是通系统调用sendFile实现的
+
+```
+$ go test -benchmem -bench IoCopy
+
+BenchmarkIoCopy client start reciving.....
+receive =  1063164745  Bytes
+receive elapsed =  3.065908458s
+receive bandwidth =  330.7055397461251  MB/s
+       1    3066049413 ns/op    1139665176 B/op 10275724 allocs/op
+       ok   github.com/feiyang21687/golang/weibo/brick/benchmark    3.074s
+
+```
+### 大文件读取
+
+```
+$ go test -benchmem -bench ReadLargeFile
+
+BenchmarkReadLargeFile  receive =  1063164745  Bytes
+elapsed =  2.174487509s
+bandwidth =  466.27672369632364  MB/s
+       1    2174919710 ns/op        4840 B/op         18 allocs/op
+       ok   github.com/feiyang21687/golang/weibo/brick/benchmark    2.191s
+```
 
